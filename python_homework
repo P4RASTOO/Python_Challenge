@@ -1,0 +1,64 @@
+# Dependencies
+import os # for file path
+import csv # for reading csv file
+from pathlib import Path
+
+# Export the results to text file
+
+
+#current_dir = os.getcwd() # get current working dir
+#print(current_dir)
+
+
+# Files to load and output
+path_budget_data = Path("Resources", "budget_data.csv")
+
+# Track various financial parameters
+total_months = 0
+net_change_list = []
+greatest_increase = ["", 0]
+greatest_decrease = ["", 9999999999999999999]
+total_net = 0
+
+# Read the csv and convert it into a list of dictionaries
+with open(path_budget_data) as financial_data:
+    reader = csv.reader(financial_data)
+    
+    # Read the header row
+    header = next(reader)
+    
+    # Extract first row to avoid appending to net_change_list
+    first_row = next(reader)
+    
+    # Track the total
+    total_months += 1
+    total_net += int(first_row[1])
+    previous_net = int(first_row[1])
+    
+    for row in reader:
+        total_months += 1
+        total_net += int(row[1])
+
+        # Track the net change
+        net_change = int(row[1]) - previous_net
+        previous_net = int(row[1])
+        net_change_list.append(net_change)
+        
+        # Track the greatest increase and decrease
+        if net_change > greatest_increase[1]:
+            greatest_increase = [row[0], net_change]
+        
+        if net_change < greatest_decrease[1]:
+            greatest_decrease = [row[0], net_change]
+        
+# Calculate the average net change
+average_net_change = sum(net_change_list) / len(net_change_list)
+
+# Print the results
+print("Financial Analysis")
+print("----------------------------")
+print(f"Total Months: {total_months}")
+print(f"Total: ${total_net}")
+print(f"Average Change: ${average_net_change:.2f}")
+print(f"Greatest Increase in Profits: {greatest_increase[0]} (${greatest_increase[1]})")
+print(f"Greatest Decrease in Losses: {greatest_decrease[0]} (${greatest_decrease[1]})")
